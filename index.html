@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>success bank - dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'inter', -apple-system, blinkmacsystemfont, 'segoe ui', roboto, sans-serif;
+        }
+
+        body.dashboard-body {
+            background-color: #f8fafc;
+            min-height: 100vh;
+        }
+
+        .app-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 280px;
+            background-color: #0b4625;
+            color: #ffffff;
+            padding: 32px 24px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: fixed;
+            height: 100vh;
+            left: 0;
+            top: 0;
+            z-index: 100;
+        }
+
+        .sidebar-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 40px;
+        }
+
+        .sidebar-brand h2 {
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .avatar-circle {
+            width: 42px;
+            height: 42px;
+            background-color: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.25);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        .sidebar-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            flex-grow: 1;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            color: #cbd5e1;
+            text-decoration: none;
+            padding: 14px 16px;
+            border-radius: 10px;
+            font-weight: 500;
+            font-size: 15px;
+            transition: all 0.2s ease;
+        }
+
+        .menu-item:hover, .menu-item.active {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+        }
+
+        .web-sign-out-btn {
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 12px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            padding: 40px 60px;
+        }
+
+        .top-nav-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 24px;
+        }
+
+        .welcome-msg h2 {
+            font-size: 26px;
+            color: #0f172a;
+            font-weight: 700;
+        }
+
+        .welcome-msg p {
+            color: #64748b;
+            margin-top: 4px;
+        }
+
+        .date-badge {
+            background-color: #e2e8f0;
+            padding: 10px 18px;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #334155;
+        }
+
+        /* Views Routing Rules */
+        .content-view {
+            display: none;
+            animation: fadein 0.3s ease-in-out forwards;
+        }
+
+        .content-view.active-view {
+            display: block;
+        }
+
+        .view-description {
+            font-size: 15px;
+            color: #64748b;
+            margin-bottom: 30px;
+            margin-top: -10px;
+        }
+
+        @keyframes fadein {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Home Grid Layout Cards */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+
+        .grid-card {
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 180px;
+        }
+
+        .dynamic-green-card { background-color: #0b4625; color: #ffffff; }
+        .normal-white-card { background-color: #ffffff; border: 1px solid #e2e8f0; color: #0f172a; }
+        .card-header-flex { display: flex; justify-content: space-between; align-items: center; font-weight: 600; font-size: 15px; }
+        .pill-badge { background-color: #f1f5f9; padding: 6px 12px; border-radius: 8px; font-size: 12px; color: #334155; border: 1px solid #e2e8f0; }
+        .amount-display { font-size: 32px; font-weight: 700; margin: 16px 0; }
+        .account-mask { font-size: 28px; font-weight: 700; margin: 16px 0; letter-spacing: 2px; }
+        .text-muted { color: #64748b; }
+        .bold-text { font-weight: 600; color: #475569; }
+
+        /* Transaction Log Architecture */
+        .ledger-section h3 { font-size: 18px; color: #0f172a; margin-bottom: 16px; font-weight: 700; }
+        .ledger-container { display: flex; flex-direction: column; gap: 12px; }
+        .ledger-row { background-color: #ffffff; border: 1px solid #e2e8f0; padding: 16px 24px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; }
+        .ledger-left { display: flex; align-items: center; gap: 16px; }
+        .transaction-details { display: flex; flex-direction: column; gap: 2px; }
+        .item-title { font-weight: 600; color: #1e293b; font-size: 15px; }
+        .item-date { font-size: 12px; color: #64748b; }
+        .activity-icon-box { width: 44px; height: 44px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 16px; }
+        .negative-icon { background-color: #fee2e2; color: #ef4444; }
+        .positive-icon { background-color: #dcfce7; color: #22c55e; }
+        .item-price { font-weight: 700; font-size: 16px; }
+        .item-price.negative { color: #ef4444; }
+        .item-price.positive { color: #22c55e; }
+
+        /* Bank Visa Card Graphic Display Rules */
+        .cards-layout-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 30px; }
+        .visa-credit-card { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #ffffff; border-radius: 16px; padding: 24px; height: 200px; display: flex; flex-direction: column; justify-content: space-between; }
+        .card-top { display: flex; justify-content: space-between; align-items: center; }
+        .card-type { font-size: 12px; letter-spacing: 1px; font-weight: 600; opacity: 0.8; }
+        .card-logo-icon { font-size: 28px; }
+        .visa-number { font-size: 22px; letter-spacing: 3px; font-weight: 500; }
+        .card-bottom { display: flex; justify-content: space-between; }
+        .card-holder-info label, .card-expiry-info label { display: block; font-size: 9px; color: #94a3b8; margin-bottom: 4px; }
+        .card-holder-info span, .card-expiry-info span { font-size: 14px; font-weight: 600; }
+        .account-details-list { display: flex; flex-direction: column; gap: 12px; }
+        .detail-item-box { background: #ffffff; padding: 16px; border-radius: 10px; border: 1px solid #e2e8f0; display: flex; justify-content: space-between; font-size: 14px; }
+
+        /* Warning/Hold Layout Styles */
+        .status-hold-dot { color: #ea580c; font-weight: 700; display: flex; align-items: center; gap: 6px; }
+
+        /* Savings Goals Layout Rules */
+        .savings-container { display: flex; flex-direction: column; gap: 20px; }
+        .goal-card-box { background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 24px; }
+        .goal-header-flex { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+        .goal-header-flex h4 { font-size: 16px; color: #0f172a; }
+        .goal-ratio { font-size: 13px; font-weight: 700; color: #0b4625; }
+        .progress-bar-bg { background-color: #f1f5f9; height: 10px; border-radius: 30px; overflow: hidden; margin-bottom: 12px; }
+        .progress-bar-fill { background-color: #0b4625; height: 100%; border-radius: 30px; }
+        .goal-amounts { display: flex; justify-content: space-between; font-size: 13px; font-weight: 600; }
+
+        /* Profile Sheet Sheet Details Layout Rules */
+        .profile-card-container { background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 40px; max-width: 600px; text-align: center; margin: 0 auto; }
+        .profile-avatar-large { width: 70px; height: 70px; background-color: #f1f5f9; color: #0b4625; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 24px; font-weight: 700; margin: 0 auto 16px auto; border: 1px solid #e2e8f0; }
+        .profile-user-title { font-size: 20px; color: #0f172a; }
+        .profile-user-email { font-size: 14px; color: #64748b; margin-top: 4px; }
+        .profile-divider { border: 0; height: 1px; background-color: #e2e8f0; margin: 24px 0; }
+        .profile-info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; text-align: left; }
+        .profile-data-field { display: flex; flex-direction: column; gap: 6px; }
+        .profile-data-field label { font-size: 12px; font-weight: 600; color: #64748b; }
+        .profile-data-field input { padding: 12px; border-radius: 8px; border: 1px solid #cbd5e1; background-color: #f8fafc; font-size: 14px; outline: none; color: #334155; font-weight: 500; }
+        .security-hold-text { color: #dc2626 !important; font-weight: 600 !important; border-color: #fca5a5 !important; background-color: #fef2f2 !important; }
+
+        /* Mobile Breakpoints Queries Layer */
+        @media (max-width: 992px) {
+            .sidebar { width: 100%; height: auto; position: relative; padding: 20px; }
+            .sidebar-menu { flex-direction: row; overflow-x: auto; padding-bottom: 8px; margin-bottom: 12px; }
+            .menu-item { white-space: nowrap; padding: 10px 14px; }
+            .main-content { margin-left: 0; padding: 24px; }
+            .top-nav-bar { flex-direction: column; align-items: flex-start; gap: 16px; }
+            .profile-info-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body class="dashboard-body">
+
+    <div class="app-layout">
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <div class="avatar-circle">s</div>
+                <h2>success bank</h2>
+            </div>
+            
+            <nav class="sidebar-menu">
+                <a href="#" class="menu-item active" data-target="home-view"><i class="fa-solid fa-house"></i> home overview</a>
+                <a href="#" class="menu-item" data-target="cards-view"><i class="fa-solid fa-credit-card"></i> cards & accounts</a>
+                <a href="#" class="menu-item" data-target="history-view"><i class="fa-solid fa-clock"></i> history log</a>
+                <a href="#" class="menu-item" data-target="savings-view"><i class="fa-solid fa-piggy-bank"></i> savings goals</a>
+                <a href="#" class="menu-item" data-target="profile-view"><i class="fa-solid fa-user"></i> profile settings</a>
+            </nav>
+
+            <button class="web-sign-out-btn"><i class="fa-solid fa-arrow-right-from-bracket"></i> sign out</button>
+        </aside>
+
+        <main class="main-content">
+            <header class="top-nav-bar">
+                <div class="welcome-msg">
+                    <h2 id="view-title">home overview</h2>
+                    <p>welcome back, hannah scott</p>
+                </div>
+                <div class="user-meta">
+                    <span class="date-badge"><i class="fa-regular fa-calendar"></i> portal active</span>
+                </div>
+            </header>
+
+            <div id="home-view" class="content-view active-view">
+                <div class="dashboard-grid">
+                    <div class="grid-card dynamic-green-card">
+                        <div class="card-header-flex"><span>available balance</span><i class="fa-regular fa-eye-slash"></i></div>
+                        <h1 class="amount-display">$5,000,000.00</h1>
+                        <span class="card-sub-info">primary liquid capital</span>
+                    </div>
+                    <div class="grid-card normal-white-card">
+                        <div class="card-header-flex"><span>current balance</span><span class="pill-badge">premier checking</span></div>
+                        <h1 class="amount-display dark">$657.00</h1>
+                        <span class="card-sub-info text-muted">ledger balance</span>
+                    </div>
+                    <div class="grid-card normal-white-card">
+                        <div class="card-header-flex"><span class="text-muted">account registered</span></div>
+                        <h1 class="account-mask">••••-9856</h1>
+                        <span class="card-sub-info bold-text">hannah scott</span>
+                    </div>
+                </div>
+
+                <section class="ledger-section">
+                    <h3>recent activity log</h3>
+                    <div class="ledger-container">
+                        <div class="ledger-row">
+                            <div class="ledger-left">
+                                <div class="activity-icon-box negative-icon"><i class="fa-solid fa-basket-shopping"></i></div>
+                                <div class="transaction-details"><span class="item-title">groceries & household supplies</span><span class="item-date">february 21, 2025</span></div>
+                            </div>
+                            <span class="item-price negative">-$50.00</span>
+                        </div>
+                        <div class="ledger-row">
+                            <div class="ledger-left">
+                                <div class="activity-icon-box positive-icon"><i class="fa-solid fa-wallet"></i></div>
+                                <div class="transaction-details"><span class="item-title">direct deposit / payroll</span><span class="item-date">february 15, 2025</span></div>
+                            </div>
+                            <span class="item-price positive">+$3,450.00</span>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <div id="cards-view" class="content-view">
+                <div class="view-description">manage your active cards and secondary bank accounts.</div>
+                <div class="cards-layout-grid">
+                    <div class="visa-credit-card">
+                        <div class="card-top"><span class="card-type">success premier</span><i class="fa-brands fa-cc-visa card-logo-icon"></i></div>
+                        <div class="card-middle"><span class="visa-number">•••• •••• •••• 9856</span></div>
+                        <div class="card-bottom">
+                            <div class="card-holder-info"><label>cardholder</label><span>hannah scott</span></div>
+                            <div class="card-expiry-info"><label>expires</label><span>06/27</span></div>
+                        </div>
+                    </div>
+                    <div class="account-details-list">
+                        <div class="detail-item-box"><strong>account owner:</strong><span>hannah scott</span></div>
+                        <div class="detail-item-box"><strong>checking account:</strong><span>••••-••••-9856</span></div>
+                        <div class="detail-item-box"><strong>savings account:</strong><span>••••-••••-4110</span></div>
+                        <div class="detail-item-box"><strong>account status:</strong><span class="status-hold-dot"><i class="fa-solid fa-triangle-exclamation"></i> on hold</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="history-view" class="content-view">
+                <div class="view-description">complete comprehensive transaction archives statement log history.</div>
+                <div class="ledger-container">
+                    <div class="ledger-row">
+                        <div class="ledger-left"><div class="activity-icon-box negative-icon"><i class="fa-solid fa-basket-shopping"></i></div>
+                        <div class="transaction-details"><span class="item-title">groceries & household supplies</span><span class="item-date">february 21, 2025</span></div></div>
+                        <span class="item-price negative">-$50.00</span>
+                    </div>
+                    <div class="ledger-row">
+                        <div class="ledger-left"><div class="activity-icon-box positive-icon"><i class="fa-solid fa-wallet"></i></div>
+                        <div class="transaction-details"><span class="item-title">direct deposit / payroll</span><span class="item-date">february 15, 2025</span></div></div>
+                        <span class="item-price positive">+$3,450.00</span>
+                    </div>
+                    <div class="ledger-row">
+                        <div class="ledger-left"><div class="activity-icon-box negative-icon"><i class="fa-solid fa-mug-hot"></i></div>
+                        <div class="transaction-details"><span class="item-title">starbucks coffee shop</span><span class="item-date">january 14, 2025</span></div></div>
+                        <span class="item-price negative">-$12.45</span>
+                    </div>
+                </div>
+            </div>
+
+            <div id="savings-view" class="content-view">
+                <div class="view-description">track progress on your active savings targets.</div>
+                <div class="savings-container">
+                    <div class="goal-card-box">
+                        <div class="goal-header-flex"><h4><i class="fa-solid fa-house-chimney"></i> real estate down payment</h4><span class="goal-ratio">85% completed</span></div>
+                        <div class="progress-bar-bg"><div class="progress-bar-fill" style="width: 85%;"></div></div>
+                        <div class="goal-amounts"><span>saved: $85,000.00</span><span class="text-muted">target: $100,000.00</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="profile-view" class="content-view">
+                <div class="view-description">review security permissions associated with your profile id.</div>
+                <div class="profile-card-container">
+                    <div class="profile-avatar-large">hs</div>
+                    <h3 class="profile-user-title">hannah scott</h3>
+                    <p class="profile-user-email">hannah.scott@successmail.com</p>
+                    <hr class="profile-divider">
+                    <div class="profile-info-grid">
+                        <div class="profile-data-field"><label>full legal name</label><input type="text" value="hannah scott" readonly></div>
+                        <div class="profile-data-field"><label>registered account id mask</label><input type="text" value="••••-••••-9856" readonly></div>
+                        <div class="profile-data-field"><label>portal authentication role</label><input type="text" value="premier client tier" readonly></div>
+                        <div class="profile-data-field"><label>system security status</label><input type="text" value="account flagged / hold active" readonly class="security-hold-text"></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const menuitems = document.querySelectorAll('.menu-item');
+        const contentviews = document.querySelectorAll('.content-view');
+        const viewtitle = document.getElementById('view-title');
+
+        menuitems.forEach(item => {
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                menuitems.forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
+                contentviews.forEach(view => view.classList.remove('active-view'));
+                const targetid = this.getAttribute('data-target');
+                document.getElementById(targetid).classList.add('active-view');
+                viewtitle.innerText = this.innerText;
+            });
+        });
+
+        document.querySelector('.web-sign-out-btn').addEventListener('click', function() {
+            window.location.href = 'login.html';
+        });
+    </script>
+</body>
+</html>
