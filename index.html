@@ -205,7 +205,7 @@
 
         /* Bank Visa Card Graphic Display Rules */
         .cards-layout-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 30px; }
-        .visa-credit-card { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #ffffff; border-radius: 16px; padding: 24px; height: 200px; display: flex; flex-direction: column; justify-content: space-between; }
+        .visa-credit-card { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #ffffff; border-radius: 16px; padding: 24px; height: 200px; display: flex; flex-direction: column; justify-content: space-between; margin: 0 auto; width: 100%; max-width: 360px; }
         .card-top { display: flex; justify-content: space-between; align-items: center; }
         .card-type { font-size: 12px; letter-spacing: 1px; font-weight: 600; opacity: 0.8; }
         .card-logo-icon { font-size: 28px; }
@@ -229,7 +229,7 @@
         .progress-bar-fill { background-color: #0b4625; height: 100%; border-radius: 30px; }
         .goal-amounts { display: flex; justify-content: space-between; font-size: 13px; font-weight: 600; }
 
-        /* Profile Sheet Sheet Details Layout Rules */
+        /* Profile Details Layout Rules */
         .profile-card-container { background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 40px; max-width: 600px; text-align: center; margin: 0 auto; }
         .profile-avatar-large { width: 70px; height: 70px; background-color: #f1f5f9; color: #0b4625; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 24px; font-weight: 700; margin: 0 auto 16px auto; border: 1px solid #e2e8f0; }
         .profile-user-title { font-size: 20px; color: #0f172a; }
@@ -241,14 +241,64 @@
         .profile-data-field input { padding: 12px; border-radius: 8px; border: 1px solid #cbd5e1; background-color: #f8fafc; font-size: 14px; outline: none; color: #334155; font-weight: 500; }
         .security-hold-text { color: #dc2626 !important; font-weight: 600 !important; border-color: #fca5a5 !important; background-color: #fef2f2 !important; }
 
-        /* Mobile Breakpoints Queries Layer */
+        /* FIXED Mobile Layout Breakpoints Rules */
         @media (max-width: 992px) {
-            .sidebar { width: 100%; height: auto; position: relative; padding: 20px; }
-            .sidebar-menu { flex-direction: row; overflow-x: auto; padding-bottom: 8px; margin-bottom: 12px; }
-            .menu-item { white-space: nowrap; padding: 10px 14px; }
-            .main-content { margin-left: 0; padding: 24px; }
-            .top-nav-bar { flex-direction: column; align-items: flex-start; gap: 16px; }
-            .profile-info-grid { grid-template-columns: 1fr; }
+            .app-layout {
+                flex-direction: column; /* Stacks navigation above the content */
+            }
+            .sidebar { 
+                width: 100%; 
+                height: auto; 
+                position: relative; 
+                padding: 20px; 
+            }
+            .sidebar-brand {
+                margin-bottom: 20px;
+                justify-content: center;
+            }
+            .sidebar-menu { 
+                flex-direction: column; /* Force vertical stacking of layout tabs */
+                width: 100%;
+                gap: 6px;
+            }
+            .menu-item { 
+                width: 100%;
+                justify-content: flex-start;
+                padding: 12px 16px;
+            }
+            .web-sign-out-btn {
+                margin-top: 15px;
+                width: 100%;
+            }
+            .main-content { 
+                margin-left: 0; 
+                padding: 20px; 
+                width: 100%;
+                overflow-x: hidden; /* Stops any rogue sideways sliding panels */
+            }
+            .top-nav-bar { 
+                flex-direction: column; 
+                align-items: center; 
+                text-align: center;
+                gap: 16px; 
+            }
+            .dashboard-grid {
+                grid-template-columns: 1fr; /* Stacks accounting balance cards vertically */
+            }
+            .cards-layout-grid {
+                grid-template-columns: 1fr; /* Stacks card view items cleanly underneath each other */
+            }
+            .profile-info-grid { 
+                grid-template-columns: 1fr; /* Stacks user inputs form boxes in a straight line */
+            }
+            .ledger-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+            .item-price {
+                align-self: flex-end;
+            }
         }
     </style>
 </head>
@@ -415,4 +465,4 @@
         });
     </script>
 </body>
-</html>
+</html>     
